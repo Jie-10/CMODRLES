@@ -2,9 +2,10 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
 % Diversity-oriented environmental selection
 
     %% Basic data
-    Obj = Population.objs;
-    Con = Population.cons;
+    Obj  = Population.objs;
+    Con  = Population.cons;
     NumQ = length(Population);
+    NW   = size(W,1);          % Actual number of reference vectors
 
     %% Calculate angles between solutions and reference vectors
     CosQW = 1-pdist2(Obj,W,'cosine');
@@ -16,8 +17,8 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
     %% Determine solutions contained in each subspace
     InSubspaceQ = AngleQ <= MinAngle;
 
-    %% Calculate epsilon-relaxed constrained fitness
-    FitnessAll = CalFitness(Obj,Con,0);
+    %% Calculate fitness
+    FitnessAll = CalFitness(Obj, Con, 0);
 
     %% Environmental selection
     selectedIndex   = zeros(1,N);
@@ -25,8 +26,8 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
     selected        = false(1,NumQ);
     selectedCount   = 0;
 
-    %% Traverse all subspaces
-    for i = 1:N
+    %% Step 1: Select one solution from each subspace
+    for i = 1:NW
 
         if selectedCount >= N
             break;
@@ -44,18 +45,21 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
 
         if isempty(Ti)
 
-            %% Empty subspace: select the nearest remaining solution
+            %% Empty subspace:
+            % Select the nearest remaining solution
             [~,bestLocal] = min(AngleQ(R,i));
             x = R(bestLocal);
 
         else
 
-            %% Non-empty subspace: select the best constrained solution
+            %% Non-empty subspace:
+            % Select the solution with the best fitness
             [~,bestLocal] = min(FitnessAll(Ti));
             x = Ti(bestLocal);
 
         end
 
+        %% Save selected solution
         selectedCount = selectedCount + 1;
 
         selectedIndex(selectedCount)   = x;
@@ -64,35 +68,35 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
         selected(x) = true;
     end
 
-    %% Fill remaining positions if necessary
-    while selectedCount < N
+    %% Step 2: Fill remaining positions according to fitness
+    if selectedCount < N
 
         R = find(~selected);
 
-        if isempty(R)
-            break;
+        if ~isempty(R)
+
+            %% Sort remaining solutions by fitness
+            [~,rank] = sort(FitnessAll(R),'ascend');
+
+            %% Number of additional solutions required
+            Need = min(N-selectedCount,length(R));
+
+            %% Select the best remaining solutions
+            Add = R(rank(1:Need));
+
+            selectedIndex(selectedCount+1:selectedCount+Need) = Add;
+            selectedFitness(selectedCount+1:selectedCount+Need) = ...
+                FitnessAll(Add);
+
+            selectedCount = selectedCount + Need;
         end
-
-        %% Find the closest solution-subspace pair
-        AngleRemain = AngleQ(R,:);
-
-        [~,index] = min(AngleRemain(:));
-        [r,~] = ind2sub(size(AngleRemain),index);
-
-        x = R(r);
-
-        selectedCount = selectedCount + 1;
-
-        selectedIndex(selectedCount)   = x;
-        selectedFitness(selectedCount) = FitnessAll(x);
-
-        selected(x) = true;
     end
 
     %% Output
-    selectedIndex = selectedIndex(1:selectedCount);
+    selectedIndex   = selectedIndex(1:selectedCount);
+    selectedFitness = selectedFitness(1:selectedCount);
 
     Population = Population(selectedIndex);
-    Fitness    = selectedFitness(1:selectedCount);
+    Fitness    = selectedFitness;
 
 end
