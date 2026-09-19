@@ -1,4 +1,4 @@
-function [Population,Fitness] = EnviromentSelect1(Population,N)
+function [Population,Fitness,selectedIndex] = EnviromentSelect1(Population,N)
 % The environmental selection of SPEA2-CDP
 
     %% Calculate the fitness of each solution
@@ -15,11 +15,13 @@ function [Population,Fitness] = EnviromentSelect1(Population,N)
         Next(Temp(Del)) = false;
     end
     % Population for next generation
+    selectedIndex = find(Next);
     Population = Population(Next);
     Fitness    = Fitness(Next);
     % Sort the population
     [Fitness,rank] = sort(Fitness);
     Population = Population(rank);
+    selectedIndex = selectedIndex(rank);
 end
 
 function Del = Truncation(PopObj,K)
