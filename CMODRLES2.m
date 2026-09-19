@@ -46,7 +46,7 @@ classdef CMODRLES2 < ALGORITHM
             gama         = 0.9;
 
             %% Optimization
-            while Algorithm.NotTerminated2(Population{1},Population{2})
+            while Algorithm.NotTerminated(Population{1})
 
                 gen = ceil(Problem.FE/(2*Problem.N));
                 
