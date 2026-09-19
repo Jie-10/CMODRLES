@@ -23,7 +23,7 @@ flowchart TD
     A --> O["MP 与被选辅助种群繁殖"]
     O --> H["共享子代集"]
     H --> M["MP：SPEA2-CDP"]
-    H --> P["AP：Tchebycheff 替换"]
+    H --> P["AP：Tchebycheff"]
     H --> D["DP：参考向量 + CDP"]
     M --> R["计算奖励与下一状态"]
     P --> R
