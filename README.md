@@ -38,10 +38,10 @@ flowchart TD
 | $D$ | 决策变量维数 |
 | $N$ | 每个种群的规模 |
 | $K$ | 权重向量数，代码中要求 AP 更新时 $K=N$ |
-| $\mathbf f(x)$ | 解 $x$ 的目标向量 |
-| $\mathbf c(x)$ | 解 $x$ 的约束向量，$c_j(x)\le 0$ 表示满足第 $j$ 个约束 |
-| $\mathbf w_i$ | 第 $i$ 个权重向量 |
-| $\mathbf z^*$ | AP 使用的理想点 |
+| $\mathbf{f}(x)$ | 解 $x$ 的目标向量 |
+| $\mathbf{c}(x)$ | 解 $x$ 的约束向量，$c_j(x)\le 0$ 表示满足第 $j$ 个约束 |
+| $\mathbf{w}_i$ | 第 $i$ 个权重向量 |
+| $\mathbf{z}^{*}$ | AP 使用的理想点 |
 | $P_M,P_A,P_D$ | MP、AP、DP |
 | $O_M,O_A,O_D$ | MP、AP、DP 产生的子代，其中每代只会产生 $O_A$ 或 $O_D$ 之一 |
 
@@ -62,7 +62,7 @@ $$
 AP 的初始理想点为：
 
 $$
-z_j^*=\min_{x\in P_A^0} f_j(x),\qquad j=1,\ldots,M.
+z_j^{*}=\min_{x\in P_A^0} f_j(x),\qquad j=1,\ldots,M.
 $$
 
 每个 AP 子代最多替换的子问题数设为：
@@ -77,8 +77,8 @@ $$
 
 $$
 \theta_{ij}=\arccos\left(
-\frac{\mathbf w_i^{\mathsf T}\mathbf w_j}
-{\|\mathbf w_i\|_2\|\mathbf w_j\|_2}
+\frac{\mathbf{w}_i^{\mathsf{T}}\mathbf{w}_j}
+{\|\mathbf{w}_i\|_2\|\mathbf{w}_j\|_2}
 \right).
 $$
 
@@ -179,12 +179,12 @@ MP 的筛选过程如下：
 
 ### 5.2 AP：无约束 Tchebycheff 替换
 
-AP 中第 $i$ 个位置与权重向量 $\mathbf w_i$ 一一对应。AP 完全忽略约束，并采用除法形式的 Tchebycheff 标量函数：
+AP 中第 $i$ 个位置与权重向量 $\mathbf{w}_i$ 一一对应。AP 完全忽略约束，并采用除法形式的 Tchebycheff 标量函数：
 
 $$
-g(x\mid \mathbf w_i,\mathbf z^*)
+g(x\mid \mathbf{w}_i,\mathbf{z}^{*})
 =\max_{1\le j\le M}
-\frac{|f_j(x)-z_j^*|}{\max(w_{ij},10^{-6})}.
+\frac{|f_j(x)-z_j^{*}|}{\max(w_{ij},10^{-6})}.
 $$
 
 共享子代中的每个解 $y\in O_S$ 按顺序执行以下操作：
@@ -192,16 +192,16 @@ $$
 1. 更新理想点：
 
    $$
-   z_j^*\leftarrow\min\bigl(z_j^*,f_j(y)\bigr).
+   z_j^{*}\leftarrow\min\bigl(z_j^{*},f_j(y)\bigr).
    $$
 
 2. 随机打乱全部 $N$ 个子问题的检查顺序；
 3. 对每个位置 $i$ 比较：
 
    $$
-   g(y\mid\mathbf w_i,\mathbf z^*)
+   g(y\mid\mathbf{w}_i,\mathbf{z}^{*})
    \le
-   g(x_i\mid\mathbf w_i,\mathbf z^*);
+   g(x_i\mid\mathbf{w}_i,\mathbf{z}^{*});
    $$
 
 4. 从满足条件的位置中，按照随机检查顺序最多替换 $n_r=2$ 个。
@@ -224,12 +224,12 @@ $$
 C_D=P_D\cup O_S,qquad |C_D|=3N.
 $$
 
-对候选解 $x_q$ 与权重向量 $\mathbf w_i$，代码使用原始目标向量相对于坐标原点的夹角：
+对候选解 $x_q$ 与权重向量 $\mathbf{w}_i$，代码使用原始目标向量相对于坐标原点的夹角：
 
 $$
 \theta_{qi}=\arccos\left(
-\frac{\mathbf f(x_q)^{\mathsf T}\mathbf w_i}
-{\|\mathbf f(x_q)\|_2\|\mathbf w_i\|_2}
+\frac{\mathbf{f}(x_q)^{\mathsf{T}}\mathbf{w}_i}
+{\|\mathbf{f}(x_q)\|_2\|\mathbf{w}_i\|_2}
 \right).
 $$
 
@@ -300,15 +300,15 @@ $$
 对已由锦标赛选出的父代 $x$，构造归一化目标方向：
 
 $$
-\mathbf u(x)=
-\frac{\mathbf f(x)-\mathbf z^{\min}}
-{\max(\|\mathbf f(x)-\mathbf z^{\min}\|_2,10^{-12})}.
+\mathbf{u}(x)=
+\frac{\mathbf{f}(x)-\mathbf{z}^{\min}}
+{\max(\|\mathbf{f}(x)-\mathbf{z}^{\min}\|_2,10^{-12})}.
 $$
 
 利用余弦相似度：
 
 $$
-\operatorname{sim}(x,y)=\mathbf u(x)^{\mathsf T}\mathbf u(y),
+\mathrm{sim}(x,y)=\mathbf{u}(x)^{\mathsf{T}}\mathbf{u}(y),
 $$
 
 在本种群中找出与父代目标方向最接近的 $N_r$ 个个体，其中：
@@ -338,7 +338,7 @@ OperatorDE(Problem,Population,...
 状态只由 MP 计算：
 
 $$
-\mathbf s_t=[s_t^{CV},s_t^{TCH}].
+\mathbf{s}_t=[s_t^{CV},s_t^{TCH}].
 $$
 
 #### 状态 1：MP 的平均总体约束违反度
@@ -351,7 +351,7 @@ $$
 
 #### 状态 2：基于参考向量的 Tchebycheff 集合指标
 
-代码维护所有已观察目标值的逐维下界 $\mathbf L_t$ 和上界 $\mathbf U_t$。初始化时使用初始 MP 与 AP；之后每代仅用新生成的共享子代更新：
+代码维护所有已观察目标值的逐维下界 $\mathbf{L}_t$ 和上界 $\mathbf{U}_t$。初始化时使用初始 MP 与 AP；之后每代仅用新生成的共享子代更新：
 
 $$
 L_{t,j}=\min(L_{t-1,j},\min_{x\in O_S^t}f_j(x)),
@@ -370,20 +370,20 @@ $$
 MP 个体的归一化目标为：
 
 $$
-\widetilde f_j(x)=
+\widetilde{f}_j(x)=
 \left|
 \frac{f_j(x)-L_{t,j}}
 {\max(U_{t,j}-L_{t,j},\eta_j)}
 \right|.
 $$
 
-对每个参考向量 $\mathbf w_i$，计算 MP 在该方向上的最佳除法式 Tchebycheff 值：
+对每个参考向量 $\mathbf{w}_i$，计算 MP 在该方向上的最佳除法式 Tchebycheff 值：
 
 $$
 v_i^t=
 \min_{x\in P_M^t}
 \max_{1\le j\le M}
-\frac{\widetilde f_j(x)}{\max(w_{ij},10^{-6})}.
+\frac{\widetilde{f}_j(x)}{\max(w_{ij},10^{-6})}.
 $$
 
 第二个状态量为全部方向的均值：
@@ -399,7 +399,7 @@ $$
 动作空间为：
 
 $$
-\mathcal A=\{1,2\}=\{\text{AP},\text{DP}\}.
+\mathcal{A}=\{1,2\}=\{\text{AP},\text{DP}\}.
 $$
 
 - MP 每代固定产生 $N$ 个子代；
@@ -411,8 +411,8 @@ $$
 $$
 a_t=
 \begin{cases}
-\arg\max_{a\in\{1,2\}}\widehat q(\mathbf s_t,a),&p=0.95,\\
-\operatorname{Uniform}\{1,2\},&p=0.05.
+\arg\max_{a\in\{1,2\}}\widehat{q}(\mathbf{s}_t,a),&p=0.95,\\
+\mathrm{Uniform}\{1,2\},&p=0.05.
 \end{cases}
 $$
 
@@ -476,13 +476,13 @@ $$
 在第 200 个随机决策阶段结束后，代码随机抽取 200 条经验，以：
 
 $$
-\mathbf x_t=[s_t^{CV},s_t^{TCH},a_t]
+\mathbf{x}_t=[s_t^{CV},s_t^{TCH},a_t]
 $$
 
 作为三维输入，并以：
 
 $$
-\mathbf y_t=[r_t,s_{t+1}^{CV},s_{t+1}^{TCH}]
+\mathbf{y}_t=[r_t,s_{t+1}^{CV},s_{t+1}^{TCH}]
 $$
 
 作为三维监督目标。输入与输出分别通过 `mapminmax` 归一化。
@@ -498,8 +498,8 @@ $$
 动作选择只使用网络输出的第一维：
 
 $$
-\widehat q(\mathbf s_t,a)
-=\widehat y_1([\mathbf s_t,a]),
+\widehat{q}(\mathbf{s}_t,a)
+=\widehat{y}_1([\mathbf{s}_t,a]),
 $$
 
 即将预测的即时奖励分量作为动作评分；预测的两个下一状态分量不直接参与动作选择。
@@ -511,13 +511,13 @@ $$
 按当前源码，先计算样本当前输入的第一维网络输出：
 
 $$
-\widehat r_i=\widehat y_1([\mathbf s_i,a_i]).
+\widehat{r}_i=\widehat{y}_1([\mathbf{s}_i,a_i]).
 $$
 
 再取整个训练批次中的全局最大预测值：
 
 $$
-b=\max_i\widehat r_i.
+b=\max_i\widehat{r}_i.
 $$
 
 随后为每条样本构造：
