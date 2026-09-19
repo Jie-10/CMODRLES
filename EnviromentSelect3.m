@@ -5,7 +5,6 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
     Obj  = Population.objs;
     Con  = Population.cons;
     NumQ = length(Population);
-    NW   = size(W,1);          % Actual number of reference vectors
 
     %% Calculate angles between solutions and reference vectors
     CosQW = 1-pdist2(Obj,W,'cosine');
@@ -27,7 +26,7 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
     selectedCount   = 0;
 
     %% Step 1: Select one solution from each subspace
-    for i = 1:NW
+    for i = 1:N
 
         if selectedCount >= N
             break;
@@ -66,30 +65,6 @@ function [Population,Fitness] = EnviromentSelect3(Population,N,MinAngle,W)
         selectedFitness(selectedCount) = FitnessAll(x);
 
         selected(x) = true;
-    end
-
-    %% Step 2: Fill remaining positions according to fitness
-    if selectedCount < N
-
-        R = find(~selected);
-
-        if ~isempty(R)
-
-            %% Sort remaining solutions by fitness
-            [~,rank] = sort(FitnessAll(R),'ascend');
-
-            %% Number of additional solutions required
-            Need = min(N-selectedCount,length(R));
-
-            %% Select the best remaining solutions
-            Add = R(rank(1:Need));
-
-            selectedIndex(selectedCount+1:selectedCount+Need) = Add;
-            selectedFitness(selectedCount+1:selectedCount+Need) = ...
-                FitnessAll(Add);
-
-            selectedCount = selectedCount + Need;
-        end
     end
 
     %% Output
