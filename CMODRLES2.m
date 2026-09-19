@@ -122,7 +122,7 @@ classdef CMODRLES2 < ALGORITHM
                 % MP: SPEA2-CDP
                 [Population{1},Fitness{1},selectedIndex] = EnviromentSelect1(CandidateMP,N);
 
-                % AP: diversity-oriented SPEA2 without constraints
+                % AP: Tchebycheff 
                 [Population{2},Fitness{2},ZAP] = EnviromentSelect2(Population{2},Shared,W,ZAP,nr);
 
                 % DP: diversity-oriented SPEA2-CDP
