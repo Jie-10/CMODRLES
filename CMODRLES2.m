@@ -1,18 +1,6 @@
 classdef CMODRLES2 < ALGORITHM
 % <2026> <multi/many> <real> <constrained/none>
 % Deep reinforcement learning assisted auxiliary-task selection
-%
-% The evolutionary framework contains three populations:
-% MP : constraint-oriented main population (SPEA2-CDP)
-% AP : objective/diversity-oriented auxiliary population
-% DP : constraint/diversity-oriented auxiliary population
-%
-% Action 1 selects AP to generate auxiliary offspring.
-% Action 2 selects DP to generate auxiliary offspring.
-%
-% The DRL implementation follows the coding style of DRLOS-EMCMO in
-% PlatEMO: Data replay, random exploration, trainmodel/testNet/updatemodel,
-% and periodic Q-network updating are all managed directly in main().
 
     methods
         function main(Algorithm,Problem)
@@ -26,6 +14,11 @@ classdef CMODRLES2 < ALGORITHM
 
             N = length(Population{1});
             [W,~] = UniformPoint(N,Problem.M);
+
+            %% Ideal point of AP
+            ZAP = min(Population{2}.objs,[],1);
+            %% Maximum replacement number
+            nr = 2;
 
             %% Reference range used by the second state variable
             InitObj = [Population{1}.objs;Population{2}.objs];
@@ -49,13 +42,14 @@ classdef CMODRLES2 < ALGORITHM
             num_action   = 2;
             model_built  = 0;
             count        = 0;
-            greedy       = 0.9;
+            greedy       = 0.95;
             gama         = 0.9;
 
             %% Optimization
-            while Algorithm.NotTerminated(Population{1})
-                gen = ceil(Problem.FE/(2*Problem.N));
+            while Algorithm.NotTerminated2(Population{1},Population{2})
 
+                gen = ceil(Problem.FE/(2*Problem.N));
+                
                 %% Old state
                 state = CMODRLES_State(Population{1}.objs,Population{1}.cons,W,Ref);
 
@@ -114,15 +108,11 @@ classdef CMODRLES2 < ALGORITHM
                 MatingPool2 = TournamentSelection(2,N,Fitness{auxIndex});
 
                 if rand > 0.5
-                    Offspring{1} = Neighbor_Pairing_Strategy(Problem, ...
-                        Population{1}(MatingPool1),Population{1},Zmin);
-                    Offspring{2} = Neighbor_Pairing_Strategy(Problem, ...
-                        Population{auxIndex}(MatingPool2),Population{auxIndex},Zmin);
+                    Offspring{1} = Neighbor_Pairing_Strategy(Problem,Population{1}(MatingPool1),Population{1},Zmin);
+                    Offspring{2} = Neighbor_Pairing_Strategy(Problem,Population{auxIndex}(MatingPool2),Population{auxIndex},Zmin);
                 else
-                    Offspring{1} = OperatorDE(Problem,Population{1}, ...
-                        Population{1}(randperm(N)),Population{1}(randperm(N)));
-                    Offspring{2} = OperatorDE(Problem,Population{auxIndex}, ...
-                        Population{auxIndex}(randperm(N)),Population{auxIndex}(randperm(N)));
+                    Offspring{1} = OperatorDE(Problem,Population{1},Population{1}(randperm(N)),Population{1}(randperm(N)));
+                    Offspring{2} = OperatorDE(Problem,Population{auxIndex},Population{auxIndex}(randperm(N)),Population{auxIndex}(randperm(N)));
                 end
 
                 %% Environmental selection
@@ -130,16 +120,13 @@ classdef CMODRLES2 < ALGORITHM
                 CandidateMP = [Population{1},Shared];
 
                 % MP: SPEA2-CDP
-                [Population{1},Fitness{1},selectedIndex] = ...
-                    EnviromentSelect1(CandidateMP,N);
+                [Population{1},Fitness{1},selectedIndex] = EnviromentSelect1(CandidateMP,N);
 
                 % AP: diversity-oriented SPEA2 without constraints
-                [Population{2},Fitness{2}] = EnviromentSelect2( ...
-                    [Population{2},Shared],N,MinAngle,W);
+                [Population{2},Fitness{2},ZAP] = EnviromentSelect2(Population{2},Shared,W,ZAP,nr);
 
                 % DP: diversity-oriented SPEA2-CDP
-                [Population{3},Fitness{3}] = EnviromentSelect3( ...
-                    [Population{3},Shared],N,MinAngle,W);
+                [Population{3},Fitness{3}] = EnviromentSelect3([Population{3},Shared],N,MinAngle,W);
 
                 %% Update the observed objective range and calculate new state
                 Ref.lo = min(Ref.lo,min(Shared.objs,[],1));
