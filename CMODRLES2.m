@@ -13,7 +13,7 @@ classdef CMODRLES2 < ALGORITHM
             Fitness{3}    = Fitness{1};
 
             N = length(Population{1});
-            [W,~] = UniformPoint(N,Problem.M);
+            [W,~] = UniformPoint(N,Problem.M,'MUD');
 
             %% Ideal point of AP
             ZAP = min(Population{2}.objs,[],1);
