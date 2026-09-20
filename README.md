@@ -191,18 +191,19 @@ $$
 
 1. 更新理想点：
 
-   $$
+   ```math
    z_j^{*}\leftarrow\min\bigl(z_j^{*},f_j(y)\bigr).
-   $$
+   ```
 
 2. 随机打乱全部 $N$ 个子问题的检查顺序；
+
 3. 对每个位置 $i$ 比较：
 
-   $$
+   ```math
    g(y\mid\mathbf{w}_i,\mathbf{z}^{*})
    \le
-   g(x_i\mid\mathbf{w}_i,\mathbf{z}^{*});
-   $$
+   g(x_i\mid\mathbf{w}_i,\mathbf{z}^{*}).
+   ```
 
 4. 从满足条件的位置中，按照随机检查顺序最多替换 $n_r=2$ 个。
 
