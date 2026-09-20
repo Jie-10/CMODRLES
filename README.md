@@ -164,7 +164,7 @@ $$
 其中 $|O_M|=|O_a|=N$，所以 $|O_S|=2N$。MP 的候选集为：
 
 $$
-C_M=P_M\cup O_S,qquad |C_M|=3N.
+C_M=P_M\cup O_S,\qquad |C_M|=3N.
 $$
 
 MP 的筛选过程如下：
@@ -189,19 +189,13 @@ $$
 
 共享子代中的每个解 $y\in O_S$ 按顺序执行以下操作：
 
-**1. 更新理想点：**
-
-$$
-z_j^{*}\leftarrow\min\bigl(z_j^{*},f_j(y)\bigr).
-$$
+**1. 更新理想点：**\
+$$z_j^{\ast}\leftarrow\min\left(z_j^{\ast},f_j(y)\right).$$
 
 **2. 随机打乱全部 $N$ 个子问题的检查顺序；**
 
-**3. 对每个位置 $i$ 比较：**
-
-$$
-g(y\mid\mathbf{w}_i,\mathbf{z}^{*})\le g(x_i\mid\mathbf{w}_i,\mathbf{z}^{*}).
-$$
+**3. 对每个位置 $i$ 比较：**\
+$$g(y\mid\mathbf{w}_i,\mathbf{z}^{\ast})\leq g(x_i\mid\mathbf{w}_i,\mathbf{z}^{\ast}).$$
 
 **4. 从满足条件的位置中，按照随机检查顺序最多替换 $n_r=2$ 个。**
 
@@ -220,7 +214,7 @@ $$
 DP 的候选集为：
 
 $$
-C_D=P_D\cup O_S,qquad |C_D|=3N.
+C_D=P_D\cup O_S,\qquad |C_D|=3N.
 $$
 
 对候选解 $x_q$ 与权重向量 $\mathbf{w}_i$，代码使用原始目标向量相对于坐标原点的夹角：
